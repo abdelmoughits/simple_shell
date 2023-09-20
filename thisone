@@ -1,0 +1,67 @@
+#include <stdio.h>
+#include <stdlib.h>
+#include <unistd.h>
+
+#define BUFFER_SIZE 5
+
+char *my_getline(void) {
+    static char buffer[BUFFER_SIZE]; /* Static buffer for reading*/
+    static size_t buffer_position = 0; /* Current position in the buffer*/
+    static size_t buffer_size = 0; /* Number of characters in the buffer*/
+    char *line = NULL;
+    size_t line_length = 0;
+    int c;
+
+    while (1) {
+        if (buffer_position >= buffer_size) {
+            /* If the buffer is empty or exhausted, refill it*/
+            buffer_size = read(STDIN_FILENO, buffer, BUFFER_SIZE);
+            if (buffer_size <= 0) {
+                /* End of file or error condition, return NULL to indicate the end*/
+                return NULL;
+            }
+            buffer_position = 0;
+        }
+
+        c = buffer[buffer_position++];
+        if (c == '\n' || c == EOF) {
+            /* End of line or end of file, terminate the string and return it*/
+            if (line != NULL) {
+                line[line_length] = '\0';
+            }
+            return line;
+        } else {
+            /*Append the character to the result string*/
+            char *new_line = realloc(line, line_length + 2);
+            if (new_line == NULL) {
+                /* Memory allocation error*/
+                free(line);
+                return NULL;
+            }
+            line = new_line;
+            line[line_length++] = c;
+        }
+    }
+}
+
+int main(void) 
+{
+	static size_t buffer_size = 0;
+	static char buffer[BUFFER_SIZE];
+	int i = 2;
+
+	while (i >= 0)
+	{
+		buffer_size = read(STDIN_FILENO, buffer, BUFFER_SIZE);
+	/**char *line;
+    while ((line = my_getline()) != NULL) {
+        printf("Read: %s\n", line);
+        free(line);
+    }*/
+		printf("%ld\n", buffer_size);
+		i--;
+	}
+
+    return 0;
+}
+
