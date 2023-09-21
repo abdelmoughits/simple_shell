@@ -158,7 +158,11 @@ char **command_list(char *line, char *command)
 	size = 0;
 	for (index = 0 ; line[index] != '\0' ; index++)
 	{
-		if (line[index] == ' ')
+		if (line[index] == ' ' && line[index + 1] == ' ')
+		{
+			index++;
+			continue; }
+		if (line[index] == ' ' && line[index + 1] != '\0')
 		{
 			index++;
 			size++;
@@ -173,7 +177,7 @@ char **command_list(char *line, char *command)
 				return (NULL); }
 			change[i] = '\0';
 			i = 0; }
-		if (size > 0)
+		if (size > 0 && change != NULL)
 		{
 			change[i] = line[index];
 			i++; }}
