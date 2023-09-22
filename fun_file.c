@@ -20,7 +20,9 @@ void sighandler(int signal)
 	(void)signal;
 	if (inputBuffer != NULL)
 	{
-		free(inputBuffer); }
+		printf("\n\n\n.%s.\n\n\n", inputBuffer);
+		free(inputBuffer);
+	}
 	exit(0); }
 /**
  * *non_interactive_mode - The firdte part of shell
@@ -185,33 +187,32 @@ char **command_list(char *line, char *command)
 	arglist[0] = command;
 	arglist[size - 1] = NULL;
 	size = 0;
-	index = 0;
+	for (index = 0 ; line[index] != ' ' && line[index] != '\0' ; index++)
+	{}
 	while (line[index] != '\0')
 	{
 		if (line[index] == ' ')
 		{
 			index++;
 			continue; }
-		if (line[index] == ' ' && line[index + 1] != '\0')
+		size++;
+		arglist[size] = NULL;
+		for (i = 0 ; line[index + i] != '\0' && line[index + i] != ' ' ; i++)
+		{}
+		arglist[size] = malloc((i + 1) * sizeof(char));
+		change = arglist[size];
+		if (arglist[size] == NULL)
 		{
-			index++;
-			size++;
-			arglist[size] = NULL;
-			for (i = 0 ; line[index + i] != '\0' && line[index + i] != ' ' ; i++)
-			{}
-			arglist[size] = malloc((i + 1) * sizeof(char));
-			change = arglist[size];
-			if (arglist[size] == NULL)
-			{
-				free_all(arglist);
-				return (NULL); }
-			change[i] = '\0';
-			i = 0; }
-		if (size > 0 && change != NULL)
+			free_all(arglist);
+			return (NULL); }
+		change[i] = '\0';
+		i = 0;
+		for (index = index ; line[index] != '\0' && line[index] != ' ' ; index++)
 		{
 			change[i] = line[index];
-			i++; }
-		index++; }
+			i++;
+		}
+	}
 	return (arglist);
 }
 /**
