@@ -20,7 +20,6 @@ void sighandler(int signal)
 	(void)signal;
 	if (inputBuffer != NULL)
 	{
-		printf("\n\n\n.%s.\n\n\n", inputBuffer);
 		free(inputBuffer);
 	}
 	exit(0); }
@@ -90,8 +89,8 @@ int interactive_mode(void)
 	size_t len = 0;
 	ssize_t size = 0;
 
-	inputBuffer = line;
-	signal(SIGINT, sighandler);
+	/**inputBuffer = line;
+	signal(SIGINT, sighandler);*/
 	while (1)
 	{
 
@@ -100,7 +99,7 @@ int interactive_mode(void)
 		num = 0;
 		write(1, "($) ", 4);
 		size = getline(&line, &len, stdin);
-		inputBuffer = line;
+		/*inputBuffer = line;*/
 		if (size == -1)
 		{
 			write(STDERR_FILENO, msg, my_strlen(msg) + 1);
