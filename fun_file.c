@@ -10,6 +10,18 @@ void free_all(char **arg);
 char *S_f_S(char *line, char cH);
 void free_all(char **arg);
 /**
+ * sighandler - the signel handler function
+ * @signal: variable used
+ * Return: nothing
+ */
+void sighandler(int signal)
+{
+	(void)signal;
+	if (inputBuffer != NULL)
+	{
+		free(inputBuffer); }
+	exit(0); }
+/**
  * *non_interactive_mode - The firdte part of shell
  * @argv: list of commands
  * Return: intiger for succes
@@ -71,17 +83,21 @@ int interactive_mode(void)
 	char *msg = "Error in input\n";
 	char *o_msg = "./shell: No such file or directory\n";
 	char **argLISTE;
-	char *line;
+	char *line = NULL;
 	size_t len = 0;
 	ssize_t size = 0;
 
+	inputBuffer = line;
+	signal(SIGINT, sighandler);
 	while (1)
 	{
+
 		command = NULL;
 		line = NULL;
 		num = 0;
 		write(1, "($) ", 4);
 		size = getline(&line, &len, stdin);
+		inputBuffer = line;
 		if (size == -1)
 		{
 			write(STDERR_FILENO, msg, my_strlen(msg) + 1);
@@ -104,6 +120,8 @@ int interactive_mode(void)
 		command = S_f_S(line, ' ');
 		if (access(command, X_OK) == -1)
 		{
+			free(command);
+			command = NULL;
 			command = shek_file(line);
 			if (command == NULL)
 			{
@@ -111,6 +129,11 @@ int interactive_mode(void)
 				free(line);
 				continue; }}
 		argLISTE = command_list(line, command);
+		if (!argLISTE)
+		{
+			free(line);
+			return (-1);
+		}
 		num = fork();
 		if (num == 0)
 		{
@@ -120,7 +143,7 @@ int interactive_mode(void)
 				perror("Error execve");
 				free(line);
 				free_all(argLISTE);
-				exit(EXIT_FAILURE); }}
+				return (-1); }}
 		else
 		{
 			num = wait(&status);
@@ -139,26 +162,32 @@ int interactive_mode(void)
 char **command_list(char *line, char *command)
 {
 	char *change;
-	int i, size = 0, index = 0;
+	int i = 0, size = 0, index = 0;
 	char **arglist = NULL;
 
 	for (index = 0 ; line[index] != '\0' ; index++)
 	{
 		if (line[index] == ' ')
 		{
+			i = 0; }
+		if (line[index] != ' '&& i == 0)
+		{
+			i = 1;
 			size++; }}
-	size += 2;
+	size++;
 	index = 0;
 	arglist = malloc(size * sizeof(char *));
 	if (arglist == NULL)
 	{
+		free(command);
 		return (NULL); }
 	arglist[0] = command;
 	arglist[size - 1] = NULL;
 	size = 0;
-	for (index = 0 ; line[index] != '\0' ; index++)
+	index = 0;
+	while (line[index] != '\0')
 	{
-		if (line[index] == ' ' && line[index + 1] == ' ')
+		if (line[index] == ' ')
 		{
 			index++;
 			continue; }
@@ -180,7 +209,8 @@ char **command_list(char *line, char *command)
 		if (size > 0 && change != NULL)
 		{
 			change[i] = line[index];
-			i++; }}
+			i++; }
+		index++; }
 	return (arglist);
 }
 /**
@@ -196,28 +226,4 @@ void free_all(char **arg)
 	{
 		free(arg[i]); }
 	free(arg);
-}
-/**
- * S_f_S - Creat a new a buffer for the first command
- * @line: the command line
- * @cH: the signe of coping end
- * Return: a pointer to the created buffer
- */
-char *S_f_S(char *line, char cH)
-{
-	char *arg;
-	int c;
-
-	arg = NULL;
-	for (c = 0 ; line[c] != '\0' && line[c] != cH ; c++)
-	{}
-	arg = malloc(c * sizeof(char));
-	if (arg == NULL)
-	{
-		return (NULL); }
-	for (c = 0 ; line[c] != '\0' && line[c] != cH ; c++)
-	{
-		arg[c] = line[c]; }
-	arg[c] = '\0';
-	return (arg);
 }

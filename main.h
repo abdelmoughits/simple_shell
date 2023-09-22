@@ -3,7 +3,11 @@
 #include <unistd.h>
 #include <stdlib.h>
 #include <sys/types.h>
+#include <signal.h>
 #include <sys/wait.h>
+#include <signal.h>
+char *inputBuffer;
+void sighandler(int signal);
 extern char **environ;
 int non_interactive_mode(char **argv);
 int interactive_mode(void);
