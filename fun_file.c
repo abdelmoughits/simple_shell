@@ -9,6 +9,7 @@ char **command_list(char *line, char *command);
 void free_all(char **arg);
 char *S_f_S(char *line, char cH);
 void free_all(char **arg);
+char *inputBuffer;
 /**
  * sighandler - the signel handler function
  * @signal: variable used
@@ -170,7 +171,7 @@ char **command_list(char *line, char *command)
 		if (line[index] == ' ')
 		{
 			i = 0; }
-		if (line[index] != ' '&& i == 0)
+		if (line[index] != ' ' && i == 0)
 		{
 			i = 1;
 			size++; }}
