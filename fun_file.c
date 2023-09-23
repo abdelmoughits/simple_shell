@@ -36,6 +36,7 @@ int non_interactive_mode(char **argv)
 	char *line;
 	size_t len = 0;
 	ssize_t size = 0;
+	(void)argv;
 
 	while (size != -1)
 	{
@@ -47,11 +48,11 @@ int non_interactive_mode(char **argv)
 		line[size - 1] = '\0';
 		if (access(line, X_OK) == -1)
 		{
-			write(STDERR_FILENO, argv[0], my_strlen(argv[0]));
+			/**write(STDERR_FILENO, argv[0], my_strlen(argv[0]));
 			write(STDERR_FILENO, ": 1: ", 5);
 			write(STDERR_FILENO, line, size - 1);
 			write(STDERR_FILENO, ": not found", 11);
-			write(STDERR_FILENO, "\n", 1);
+			write(STDERR_FILENO, "\n", 1);*/
 			free(line);
 			return (0); }
 		argLISTE = command_list(line, line);
